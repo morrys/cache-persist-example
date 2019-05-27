@@ -12,7 +12,7 @@
  */
 
 import * as React from 'react';
-import {useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SyntheticEvent } from 'react';
 import styled from 'styled-components';
 
@@ -29,10 +29,10 @@ const ENTER_KEY_CODE = 13;
 const ESC_KEY_CODE = 27;
 
 const StyledInput = styled.input`
-padding: 10px;
+  padding: 10px;
   font-size: 16px;
   border: 2px solid #FFF;
-width: 165px;
+  width: 350px;
 `
 
 const TodoTextInput = ({
@@ -48,7 +48,7 @@ const TodoTextInput = ({
 
   useEffect(() => {
     if (inputRef && inputRef.current) {
-        (inputRef.current as any).focus();
+      (inputRef.current as any).focus();
     }
   }, [inputRef]);
 

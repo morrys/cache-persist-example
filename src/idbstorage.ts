@@ -1,7 +1,8 @@
 import { openDB, DBSchema } from 'idb';
+import { DataCache, CacheStorage } from './Cache';
 
 
-function createIdbStorage(name: string, prefix: string) {
+function createIdbStorage(name: string, prefix: string): CacheStorage {
     /** @var {Object} */
     const options = {
         /** Database name */
@@ -34,25 +35,25 @@ function createIdbStorage(name: string, prefix: string) {
         }
     })
 
-
     return {
+        getCacheName: ():string => "IndexedDB" + options.name + "-" + options.storeName,
         purge: () => {
             dbPromise.then(db => db.clear(options.storeName));
             
         },
-        restore: (): Promise<Map<string, Object>> => {
+        restore: (deserialize: boolean): Promise<DataCache> => {
             return dbPromise.then(db =>
                 db.getAllKeys(options.storeName).then(async keys => {
-                    const result: Map<string, Object> = new Map();
+                    const result: DataCache = new Map();
                     for (var i = 0; i < keys.length; i++) {
                         const value = await db.get(options.storeName, keys[i]);
-                        result.set(""+keys[i], value);
+                        result[""+keys[i]] = deserialize ? JSON.parse(value) : value;
                     }
                     return result;
                 })
             );
         },
-        setItem: (key: string, item: object): Promise<any> => {
+        setItem: (key: string, item: object): Promise<void> => {
             return dbPromise.then(db =>
                 db.put(options.storeName, item, key))
         },

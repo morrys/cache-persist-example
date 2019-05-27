@@ -22,6 +22,8 @@ interface Props {
 const Todo = (props: Props) => {
     
     const { item, deleteItem } = props;
+    
+    console.log(item);
 
     const handleOnClick = () => {
         deleteItem(item.key)

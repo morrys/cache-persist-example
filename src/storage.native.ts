@@ -1,21 +1,24 @@
 import { AsyncStorage } from 'react-native';
+import { DataCache, CacheStorage } from './Cache';
 
 
-function NativeStorage(name: string, prefix: string) {
+function NativeStorage(name: string, prefix: string): CacheStorage {
     const prefixKey = name + "-" + prefix + ".";
     return {
+        getCacheName: ():string => "AsyncStorage" + name + "-" + prefix,
         purge: () => {
             AsyncStorage.getAllKeys().then((keys: Array<string>) =>
                 AsyncStorage.multiRemove(keys.filter((key => key.startsWith(prefixKey)))));
         },
-        restore: (): Promise<Map<string, Object>> => {
+        restore: (deserialize: boolean): Promise<DataCache> => {
             return AsyncStorage.getAllKeys().then((keys: Array<string>) =>
-                AsyncStorage.multiGet(keys.filter((key => key.startsWith(prefixKey)))).then((data: Array<Array<string>>): Map<string, Object> => {
-                    const result: Map<string, Object> = new Map();
+                AsyncStorage.multiGet(keys.filter((key => key.startsWith(prefixKey)))).then((data: Array<Array<string>>): DataCache => {
+                    const result: DataCache = {};
                     for (var i = 0; i < data.length; i++) {
                         const item = data[i];
                         const key = item[0];
-                        result.set(key.slice(prefixKey.length), item[1]);
+                        const value = deserialize ? JSON.parse(item[1]) : item[1];
+                        result[key.slice(prefixKey.length)] = value;
                     }
                     return result;
                 }));

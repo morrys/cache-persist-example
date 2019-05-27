@@ -1,14 +1,31 @@
 import createStorage from "./storage";
 
+export interface CacheOptions {
+        createStorage?: (name: string, prefix: string) => CacheStorage, 
+        name?: string, 
+        prefix?: string, 
+        serialize?: boolean
+}
+
+export type DataCache = {
+    [key: string]: any
+}
+
+export interface CacheStorage {
+    getCacheName: () => string;
+    purge: () => void;
+    restore: (deserialize: boolean) => Promise<DataCache>;
+    setItem: (key: string, item: string | object) => Promise<void>;
+    removeItem: (key: string) => Promise<void>;
+}
 
 class Cache {
-    data: Map<string, Object> = new Map();
-    rehydrated: boolean = false;
-    serialize: boolean = true;
-    prefix: string = "cache-persist:";
-    storage: any;
+    private data: DataCache = {};
+    private rehydrated: boolean = false;
+    private serialize: boolean = true;
+    private storage: CacheStorage;
 
-    constructor(options :{createStorage?: (name: string, prefix: string) => any, name?: string, prefix?: string, serialize?: boolean} = {}) { //TODO custom storage
+    constructor(options : CacheOptions = {}) { //TODO custom storage
         options = {
             createStorage: createStorage,
             name: 'cache',
@@ -20,9 +37,11 @@ class Cache {
         this.storage = options.createStorage(options.name, options.prefix)
     }
 
+    isRehydrated(): boolean { return this.rehydrated}
+
     restore(): Promise<Cache> {
         return new Promise((resolve, reject) => {
-            this.storage.restore().then(result => {
+            this.storage.restore(this.serialize).then(result => {
                 this.data = result;
                 this.rehydrated = true;
                 resolve(this)
@@ -31,31 +50,44 @@ class Cache {
         
     }
 
+    getStorageName(): string {
+        return this.storage.getCacheName()
+    }
+
     purge(): void {
-        this.data = new Map();
+        this.data = {};
         this.storage.purge();
     }
 
+    getState(): Readonly<{ [key: string]: any }> {
+        return this.data;
+    }
+
     get(key: string): any {
-        return this.data.get(key);
+        return this.data[key];
     }
 
     set(key: string, value: any): Promise<any> {
         //if (!key) return handleError('set', 'a key');
 
-        this.data.set(key, value);
+        this.data[key] = value;
         return this.storage.setItem(key, this.serialize ? JSON.stringify(value) : value);
+    }
+
+    delete(key: string): Promise<any> {
+        //if (!key) return handleError('remove', 'a key');
+        this.data[key] = null;
+        return this.storage.setItem(key, null);
     }
 
     remove(key: string): Promise<any> {
         //if (!key) return handleError('remove', 'a key');
-
-        this.data.delete(key);
+        delete this.data[key];
         return this.storage.removeItem(key);
     }
 
     getAllKeys(): Array<string> {
-        return Array.from(this.data.keys());
+        return Object.keys(this.data);
     }
 }
 

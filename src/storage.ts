@@ -1,3 +1,5 @@
+import { DataCache, CacheStorage } from "./Cache";
+
 function noop() { }
 let noopStorage = {
     clear: noop,
@@ -32,10 +34,14 @@ function getStorage(type: string): any {
         return noopStorage;
     }
 }
+
 let storage = getStorage('local')
-function webStorage(name: string, prefix: string) {
+
+function webStorage(name: string, prefix: string): CacheStorage {
     const prefixKey = name+"-"+prefix+".";
     return {
+        getCacheName: ():string => "localStorage" + name+"-"+prefix,
+
         purge: () => {
             for (var i = 0; i < storage.length; i++) {
                 const key: string = storage.key(i);
@@ -44,13 +50,15 @@ function webStorage(name: string, prefix: string) {
                 }
             }
         },
-        restore: (): Promise<Map<string, Object>> => {
+        restore: (deserialize: boolean): Promise<DataCache> => {
             return new Promise((resolve, reject) => {
-                const data: Map<string, Object> = new Map();
+                const data: DataCache = {};
                 for (var i = 0; i < storage.length; i++) {
                     const key: string = storage.key(i);
-                    if (key.startsWith(prefixKey))
-                        data.set(key.slice(prefixKey.length), storage.getItem(key));
+                    if (key.startsWith(prefixKey)) {
+                        const value = deserialize ? JSON.parse(storage.getItem(key)) : storage.getItem(key);
+                        data[key.slice(prefixKey.length)] = value;
+                    }
                 }
                 resolve(data)
             })
