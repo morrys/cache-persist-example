@@ -19,20 +19,33 @@ CacheOptions {
 }
 
 createStorage: in order to create a custom storage
+
 the keys of the values saved in the storage are so composed: name + "-" + prefix + "."
+
 serialize: if it is true, the data will be serialized and deserialized JSON 
+
 
 ## Cache
 isRehydrated(): boolean; // true if restored
+
 restore(): Promise<Cache>; // restore storage, set rehydratad
+    
 getStorageName(): string;  // storage name
+
 purge(): void; // purge state and storage
+
 getState(): Readonly<{v[key: string]: any; }>; // return in memory state
+
 get(key: string): any; // get value from in memory state
+
 getAllKeys(): Array<string>; // getAllKeys value from in memory state
+    
 set(key: string, value: any): Promise<any>; // set value in state (sync) and in storage (async)
+    
 delete(key: string): Promise<any>; // delete value in state (sync) and in storage (async)
+    
 remove(key: string): Promise<any>; // remove value in state (sync) and in storage (async)
+    
 
 
 ## Usage default
