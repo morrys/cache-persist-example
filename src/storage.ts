@@ -33,28 +33,39 @@ function getStorage(type: string): any {
     }
 }
 let storage = getStorage('local')
-const webStorage = {
-    purge: () => storage.clear(),
-    restore: (): Promise<Map<string, Object>> => {
-        return new Promise((resolve, reject) => {
-            const data: Map<string, Object> = new Map();
+function webStorage(name: string, prefix: string) {
+    const prefixKey = name+"-"+prefix+".";
+    return {
+        purge: () => {
             for (var i = 0; i < storage.length; i++) {
-                const key = storage.key(i);
-                data.set(key, storage.getItem(key));
+                const key: string = storage.key(i);
+                if (key.startsWith(prefixKey)) {
+                    storage.removeItem(key);
+                }
             }
-            resolve(data)
-        })
-    },
-    setItem: (key: string, item: string): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            resolve(storage.setItem(key, item))
-        })
-    },
-    removeItem: (key: string): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            resolve(storage.removeItem(key))
-        })
-    },
+        },
+        restore: (): Promise<Map<string, Object>> => {
+            return new Promise((resolve, reject) => {
+                const data: Map<string, Object> = new Map();
+                for (var i = 0; i < storage.length; i++) {
+                    const key: string = storage.key(i);
+                    if (key.startsWith(prefixKey))
+                        data.set(key.slice(prefixKey.length), storage.getItem(key));
+                }
+                resolve(data)
+            })
+        },
+        setItem: (key: string, item: string): Promise<void> => {
+            return new Promise((resolve, reject) => {
+                resolve(storage.setItem(prefixKey+key, item))
+            })
+        },
+        removeItem: (key: string): Promise<void> => {
+            return new Promise((resolve, reject) => {
+                resolve(storage.removeItem(prefixKey+key))
+            })
+        },
+    }
 }
 
 export default webStorage;

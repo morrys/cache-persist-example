@@ -1,23 +1,23 @@
 import { openDB, DBSchema } from 'idb';
 
 
-function createIdbStorage(options: any = {}) {
+function createIdbStorage(name: string, prefix: string) {
     /** @var {Object} */
-    options = {
+    const options = {
         /** Database name */
-        name: 'PersistDB',
+        name: name || 'PersistDB',
         /** Store name */
-        storeName: 'cache',
+        storeName: prefix || 'cache',
         /** Database version */
         version: 1,
         /** Upgrade callback. Useful when for example switching storeName */
         upgradeCallback: upgradeDb => upgradeDb.createObjectStore(options.storeName),
-        /** Custom options */
-        ...options,
     }
 
-    interface CacheDB extends DBSchema {
-        'cache': {
+    //const namee:string = options.storeName;
+
+    /*interface CacheDB extends DBSchema {
+        [namee]: {
             id: string,
             key: string,
             value: {
@@ -25,10 +25,10 @@ function createIdbStorage(options: any = {}) {
                 id: string
             },
         },
-    }
+    }*/
 
     /** @var {Promise} */
-    const dbPromise = openDB<CacheDB>(options.name, options.version, {
+    const dbPromise = openDB<any>(options.name, options.version, {
         upgrade(dbPromise) {
             dbPromise.createObjectStore(options.storeName);
         }
