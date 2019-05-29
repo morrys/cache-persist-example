@@ -1,1 +1,4 @@
-export {default as Cache} from "./Cache";
+import Cache from "./Cache";
+export * from "./Cache";
+
+export default Cache;

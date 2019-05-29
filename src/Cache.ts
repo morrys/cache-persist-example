@@ -1,10 +1,12 @@
 import createStorage from "./storage";
 
 export interface CacheOptions {
-        createStorage?: (name: string, prefix: string) => CacheStorage, 
+        storage?: CacheStorage, 
         name?: string, 
         prefix?: string, 
-        serialize?: boolean
+        version?: number,
+        serialize?: boolean,
+        encryption?: boolean //TODO
 }
 
 export type DataCache = {
@@ -27,14 +29,13 @@ class Cache {
 
     constructor(options : CacheOptions = {}) { //TODO custom storage
         options = {
-            createStorage: createStorage,
             name: 'cache',
             prefix: 'persist',
             serialize: true,
             ...options,
         }
         this.serialize = options.serialize;
-        this.storage = options.createStorage(options.name, options.prefix)
+        this.storage = options.storage || createStorage(options.name, options.prefix);
     }
 
     isRehydrated(): boolean { return this.rehydrated}

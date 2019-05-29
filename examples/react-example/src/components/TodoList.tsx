@@ -2,10 +2,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 import TodoTextInput from './TodoTextInput';
 import Todo from './Todo';
-import { Cache } from "cache-persist";
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { DataCache, CacheOptions } from 'cache-persist/lib/Cache';
+import Cache, { DataCache } from 'cache-persist';
 
 const StyledHeader = styled.div`
   padding: 10px;
@@ -25,13 +24,13 @@ const StyledList = styled.ul`
 `;
 
 interface Props {
-  options?: CacheOptions
+  cache: Cache
 }
 
 
 const TodoList = (props: Props) => {
 
-  const [cache, ] = useState(new Cache(props.options))
+  const [cache, ] = useState(props.cache)
 
   const [result, setResult] = useState<{loading: boolean, data: DataCache}>({loading: true, data: new Map()});
 

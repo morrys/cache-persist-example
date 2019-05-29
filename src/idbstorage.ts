@@ -1,52 +1,49 @@
-import { openDB, DBSchema } from 'idb';
+import { openDB, IDBPDatabase } from 'idb';
 import { DataCache, CacheStorage } from './Cache';
 
+class IDBStorage {
 
-function createIdbStorage(name: string, prefix: string): CacheStorage {
-    /** @var {Object} */
-    const options = {
-        /** Database name */
-        name: name || 'PersistDB',
-        /** Store name */
-        storeName: prefix || 'cache',
-        /** Database version */
-        version: 1,
-        /** Upgrade callback. Useful when for example switching storeName */
-        upgradeCallback: upgradeDb => upgradeDb.createObjectStore(options.storeName),
+    static create(name?: string, storeNames?: string[]):CacheStorage[] {
+
+        const options = {
+            /** Database name */
+            name: name || 'cache',
+            /** Store name */
+            storeNames: ['persist'],
+            /** Database version */
+            version: 1,
+        }
+
+        const dbPromise = openDB<any>(options.name, options.version, {
+            upgrade(dbPromise) {
+                storeNames.forEach(storeName => {
+                    dbPromise.createObjectStore(storeName);
+                });
+               
+            }
+        })
+
+        const listItems = storeNames.map((value) => (
+            createIdbStorage(dbPromise, options.name, value)
+            ));
+
+        return listItems;
     }
 
-    //const namee:string = options.storeName;
+}
 
-    /*interface CacheDB extends DBSchema {
-        [namee]: {
-            id: string,
-            key: string,
-            value: {
-                record: any,
-                id: string
-            },
-        },
-    }*/
-
-    /** @var {Promise} */
-    const dbPromise = openDB<any>(options.name, options.version, {
-        upgrade(dbPromise) {
-            dbPromise.createObjectStore(options.storeName);
-        }
-    })
-
+function createIdbStorage(dbPromise: Promise<IDBPDatabase<any>>, name: string, storeName: string){
     return {
-        getCacheName: ():string => "IndexedDB" + options.name + "-" + options.storeName,
+        getCacheName: ():string => "IDB-" + name + "-" + storeName,
         purge: () => {
-            dbPromise.then(db => db.clear(options.storeName));
-            
+            dbPromise.then(db => db.clear(storeName));
         },
         restore: (deserialize: boolean): Promise<DataCache> => {
             return dbPromise.then(db =>
-                db.getAllKeys(options.storeName).then(async keys => {
+                db.getAllKeys(storeName).then(async keys => {
                     const result: DataCache = new Map();
                     for (var i = 0; i < keys.length; i++) {
-                        const value = await db.get(options.storeName, keys[i]);
+                        const value = await db.get(storeName, keys[i]);
                         result[""+keys[i]] = deserialize ? JSON.parse(value) : value;
                     }
                     return result;
@@ -55,13 +52,13 @@ function createIdbStorage(name: string, prefix: string): CacheStorage {
         },
         setItem: (key: string, item: object): Promise<void> => {
             return dbPromise.then(db =>
-                db.put(options.storeName, item, key))
+                db.put(storeName, item, key))
         },
         removeItem: (key: string): Promise<void> => {
             return dbPromise.then(db =>
-                db.delete(options.storeName, key) )
+                db.delete(storeName, key) )
         },
     }
 }
 
-export default createIdbStorage;
+export default IDBStorage;

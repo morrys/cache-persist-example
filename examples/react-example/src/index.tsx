@@ -2,8 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import TodoList from './components/TodoList';
-import createIdbStorage from 'cache-persist/lib/idbstorage';
-import { CacheOptions } from 'cache-persist/lib/Cache';
+import IDBStorage from 'cache-persist/lib/idbstorage';
+import Cache, { CacheStorage }  from 'cache-persist';
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -27,28 +27,36 @@ const StyledApp = styled.div`
     flex-direction: column-reverse;
 `;
 
+const CacheLocalNew = new Cache({
+    name: 'cachenew',
+});
+
+const idbStorages: CacheStorage[] = IDBStorage.create("cache", ["persist", "persist2"]);
+
+console.log(idbStorages[0]);
+
+console.log(idbStorages);
+
+const CacheLocalIDB = new Cache({
+    serialize: false,
+    storage: idbStorages[0],
+});
+
+
+const CacheLocalIDB2 = new Cache({
+    serialize: false,
+    storage: idbStorages[1],
+});
+
+const CacheLocal = new Cache();
+
 const App = () => {
 
-    const optionLocalNew: CacheOptions = {
-        name: 'persistnew',
-    }
-
-    const optionIDB: CacheOptions = {
-        createStorage: createIdbStorage,
-        serialize: false
-    }
-
-    const optionIDBnew: CacheOptions = {
-        createStorage: createIdbStorage,
-        name: 'persistnew',
-        serialize: false,
-    }
-
     return <StyledApp>
-            <TodoList />
-            <TodoList options = { optionLocalNew } />
-            <TodoList options = { optionIDB }/>
-            <TodoList options = { optionIDBnew }/>
+            <TodoList cache={CacheLocalIDB}/>
+            <TodoList cache={CacheLocalIDB2} />
+            <TodoList cache={CacheLocal}/>
+            <TodoList cache={CacheLocalNew}/>
          </StyledApp>
 }
 

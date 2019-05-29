@@ -12,13 +12,13 @@ yarn add cache-persist
 
 ## Options
 CacheOptions {
-    createStorage?: (name: string, prefix: string) => CacheStorage, 
+    storage?: Cache, 
     name?: string, 
     prefix?: string, 
     serialize?: boolean
 }
 
-createStorage: in order to create a custom storage
+storage: custom storage
 the keys of the values saved in the storage are so composed: name + "-" + prefix + "."
 serialize: if it is true, the data will be serialized and deserialized JSON 
 
@@ -47,18 +47,29 @@ cache.restore().then(() => {
 ## Usage indexedDB
 
 ```ts
-import { Cache } from "cache-persist";
+import Cache { CacheStorage } from "cache-persist";
 import createIdbStorage from 'cache-persist/lib/idbstorage';
 
-const optionIDBnew: CacheOptions = {
-        createStorage: createIdbStorage,
-        name: 'persistnew',
+const idbStorages: CacheStorage[] = IDBStorage.create("cache", ["persist", "persist2"]);
+
+const idb: CacheOptions = {
+        storage: idbStorages[0],
         serialize: false,
     }
 
-const cache = new Cache(optionIDBnew);
-cache.restore().then(() => {
-    const state = cache.getState();
+const idb1: CacheOptions = {
+        storage: idbStorages[1],
+        serialize: false,
+    }
+
+const cacheidb = new Cache(idb);
+cacheidb.restore().then(() => {
+    const state = cacheidb.getState();
+});
+
+const cacheidb1 = new Cache(idb1);
+cacheidb1.restore().then(() => {
+    const state = cacheidb1.getState();
 });
 ```
 ## Hooks example
@@ -67,7 +78,7 @@ cache.restore().then(() => {
 import * as React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { DataCache } from 'cache-persist/lib/Cache';
+import { DataCache } from 'cache-persist';
 
 const [result, setResult] = useState<{loading: boolean, data: DataCache}>({loading: true, data: {}});
 
