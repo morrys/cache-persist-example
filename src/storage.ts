@@ -37,10 +37,10 @@ function getStorage(type: string): any {
 
 let storage = getStorage('local')
 
-function webStorage(name: string, prefix: string): CacheStorage {
-    const prefixKey = name+"-"+prefix+".";
+function webStorage(prefix: string): CacheStorage {
+    const prefixKey = prefix+".";
     return {
-        getCacheName: ():string => "LS-" + name+"-"+prefix,
+        getCacheName: ():string => "LS-" + prefix,
 
         purge: () => {
             for (var i = 0; i < storage.length; i++) {

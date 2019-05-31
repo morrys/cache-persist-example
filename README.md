@@ -13,7 +13,6 @@ yarn add cache-persist
 ## Options
 CacheOptions {
     storage?: Cache, 
-    name?: string, 
     prefix?: string, 
     serialize?: boolean
 }
@@ -21,7 +20,7 @@ CacheOptions {
 
 storage: custom storage
 
-the keys of the values saved in the storage are so composed: name + "-" + prefix + "."
+prefix: prefix keys
 
 serialize: if it is true, the data will be serialized and deserialized JSON 
 
@@ -61,8 +60,8 @@ cache.restore().then(() => {
 ## Usage indexedDB
 
 ```ts
-import Cache { CacheStorage } from "cache-persist";
-import createIdbStorage from 'cache-persist/lib/idbstorage';
+import Cache, { CacheStorage } from "cache-persist";
+import IDBStorage from 'cache-persist/lib/idbstorage';
 
 const idbStorages: CacheStorage[] = IDBStorage.create("cache", ["persist", "persist2"]);
 

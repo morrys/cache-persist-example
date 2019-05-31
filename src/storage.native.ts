@@ -2,10 +2,10 @@ import { AsyncStorage } from 'react-native';
 import { DataCache, CacheStorage } from './Cache';
 
 
-function NativeStorage(name: string, prefix: string): CacheStorage {
-    const prefixKey = name + "-" + prefix + ".";
+function NativeStorage(prefix: string): CacheStorage {
+    const prefixKey = prefix + ".";
     return {
-        getCacheName: ():string => "AS-" + name + "-" + prefix,
+        getCacheName: ():string => "AS-" + prefix,
         purge: () => {
             AsyncStorage.getAllKeys().then((keys: Array<string>) =>
                 AsyncStorage.multiRemove(keys.filter((key => key.startsWith(prefixKey)))));

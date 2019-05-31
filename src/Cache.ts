@@ -2,7 +2,6 @@ import createStorage from "./storage";
 
 export interface CacheOptions {
         storage?: CacheStorage, 
-        name?: string, 
         prefix?: string, 
         version?: number,
         serialize?: boolean,
@@ -29,13 +28,12 @@ class Cache {
 
     constructor(options : CacheOptions = {}) { //TODO custom storage
         options = {
-            name: 'cache',
-            prefix: 'persist',
+            prefix: 'cache',
             serialize: true,
             ...options,
         }
         this.serialize = options.serialize;
-        this.storage = options.storage || createStorage(options.name, options.prefix);
+        this.storage = options.storage || createStorage(options.prefix);
     }
 
     isRehydrated(): boolean { return this.rehydrated}

@@ -28,7 +28,7 @@ const StyledApp = styled.div`
 `;
 
 const CacheLocalNew = new Cache({
-    name: 'cachenew',
+    prefix: 'cachenew',
 });
 
 const idbStorages: CacheStorage[] = IDBStorage.create("cache", ["persist", "persist2"]);
