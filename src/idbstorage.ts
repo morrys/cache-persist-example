@@ -32,8 +32,9 @@ class IDBStorage {
 
 }
 
-function createIdbStorage(dbPromise: Promise<IDBPDatabase<any>>, name: string, storeName: string){
+function createIdbStorage(dbPromise: Promise<IDBPDatabase<any>>, name: string, storeName: string): CacheStorage{
     return {
+        getStorage: ():any => dbPromise,
         getCacheName: ():string => "IDB-" + name + "-" + storeName,
         purge: () => {
             dbPromise.then(db => db.clear(storeName));

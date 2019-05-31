@@ -13,6 +13,7 @@ export type DataCache = {
 }
 
 export interface CacheStorage {
+    getStorage: () => any;
     getCacheName: () => string;
     purge: () => void;
     restore: (deserialize: boolean) => Promise<DataCache>;

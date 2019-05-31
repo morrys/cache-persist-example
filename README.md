@@ -60,7 +60,7 @@ cache.restore().then(() => {
 ## Usage indexedDB
 
 ```ts
-import Cache, { CacheStorage } from "cache-persist";
+import Cache, { CacheStorage, CacheOptions } from "cache-persist";
 import IDBStorage from 'cache-persist/lib/idbstorage';
 
 const idbStorages: CacheStorage[] = IDBStorage.create("cache", ["persist", "persist2"]);

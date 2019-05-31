@@ -5,6 +5,7 @@ import { DataCache, CacheStorage } from './Cache';
 function NativeStorage(prefix: string): CacheStorage {
     const prefixKey = prefix + ".";
     return {
+        getStorage: ():any => AsyncStorage,
         getCacheName: ():string => "AS-" + prefix,
         purge: () => {
             AsyncStorage.getAllKeys().then((keys: Array<string>) =>
