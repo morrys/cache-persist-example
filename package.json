@@ -1,6 +1,6 @@
 {
   "name": "cache-persist",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "keywords": [
     "cache",
     "react-native",
@@ -10,7 +10,7 @@
     "indexeddb"
   ],
   "main": "lib/index.js",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "description": "Cache Persist",
   "author": {
     "name": "morrys"
